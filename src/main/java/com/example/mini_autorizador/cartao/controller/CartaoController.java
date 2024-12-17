@@ -17,7 +17,7 @@ public class CartaoController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> criarCartao(@RequestBody Cartao cartao) {
+    public ResponseEntity<Cartao> criarCartao(@RequestBody Cartao cartao) {
         return cartaoService.criarCartao(cartao);
     }
 
