@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -19,11 +20,10 @@ public class CartaoService {
     }
 
     public ResponseEntity<Object> criarCartao(Cartao cartao) {
-        if (cartaoRepository.existsById(cartao.getNumeroCartao())) {
-            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(cartao);
-        }
-        cartaoRepository.save(cartao);
-        return ResponseEntity.status(HttpStatus.CREATED).body(cartao);
+        return Optional.of(cartao)
+                .filter(c -> !cartaoRepository.existsById(c.getNumeroCartao()))
+                .map(c -> ResponseEntity.status(HttpStatus.CREATED).body((Object) cartaoRepository.save(c)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body((Object) "CARTAO_EXISTENTE"));
     }
 
     public ResponseEntity<BigDecimal> obterSaldo(String numeroCartao) {

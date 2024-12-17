@@ -20,20 +20,22 @@ public class TransacaoService {
         this.validadorTransacao = validadorTransacao;
     }
 
-    @Transactional
     public ResponseEntity<Object> processarTransacao(TransacaoDTO transacaoDTO) {
-        Cartao cartao = cartaoRepository.findByNumeroCartaoForUpdate(transacaoDTO.getNumeroCartao())
-                .orElseThrow(() -> new RegraAutorizacaoException("CARTAO_INEXISTENTE"));
+        return cartaoRepository.findByNumeroCartaoForUpdate(transacaoDTO.getNumeroCartao())
+                .<ResponseEntity<Object>>map(cartao -> {
+                    try {
+                        validadorTransacao.validar(transacaoDTO, cartao);
+                        return processarTransacaoComSucesso(cartao, transacaoDTO);
+                    } catch (RegraAutorizacaoException ex) {
+                        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body((Object) ex.getMessage());
+                    }
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body((Object) "CARTAO_INEXISTENTE"));
+    }
 
-        try {
-            validadorTransacao.validar(transacaoDTO, cartao);
-        } catch (RegraAutorizacaoException ex) {
-            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(ex.getMessage());
-        }
-
+    private ResponseEntity<Object> processarTransacaoComSucesso(Cartao cartao, TransacaoDTO transacaoDTO) {
         cartao.setSaldo(cartao.getSaldo().subtract(transacaoDTO.getValor()));
         cartaoRepository.save(cartao);
-
         return ResponseEntity.status(HttpStatus.CREATED).body("OK");
     }
 }

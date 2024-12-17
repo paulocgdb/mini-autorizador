@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS cartao (
+    numero_cartao VARCHAR(16) NOT NULL PRIMARY KEY,
+    senha VARCHAR(10) NOT NULL,
+    saldo DECIMAL(10, 2) NOT NULL
+);
