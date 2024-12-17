@@ -24,7 +24,8 @@ e tornar a solução mais elegante também.
 
 # Rodar a aplicação
 
-### 1 - Tenha o Docker rodando localmente
-### 2 - Execute docker-compose up --build
-### 3 - Utilize o Postam ou similares para as requisições de teste
-### 4 - Não esquecer da autenticação informada, username, password
+### 1 - Inicie o Docker localmente
+### 2 - Execute o Docker Compose na pasta raiz do projeto
+#### docker-compose up --build
+### 3 - Compile e inicie a aplicação
+### 4 - Teste as requisições
